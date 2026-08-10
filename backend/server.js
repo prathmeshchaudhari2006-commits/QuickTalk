@@ -44,18 +44,15 @@ setupSocket(io);
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/realtime_chat";
 
+server.listen(PORT, () => {
+  console.log(`[Server] Terminal Signal Backend running on port ${PORT}`);
+});
+
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, { serverSelectionTimeoutMS: 3000 })
   .then(() => {
     console.log("[MongoDB] Connected successfully to:", MONGODB_URI);
-    server.listen(PORT, () => {
-      console.log(`[Server] Terminal Signal Backend running on port ${PORT}`);
-    });
   })
   .catch((err) => {
-    console.error("[MongoDB] Connection error:", err.message);
-    console.log("[Server] Starting HTTP server anyway (will retry DB on request)...");
-    server.listen(PORT, () => {
-      console.log(`[Server] Terminal Signal Backend running on port ${PORT} (DB offline)`);
-    });
+    console.error("[MongoDB] Connection warning (running in fallback mode):", err.message);
   });
